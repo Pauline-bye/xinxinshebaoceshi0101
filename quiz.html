@@ -296,37 +296,50 @@
   }
 
   // ---------- 提交调研数据到邮箱 ----------
-  function submitSurvey() {
-    let age = document.getElementById('ageGroup').value;
-    let job = document.getElementById('jobStatus').value;
-    let insurance = document.getElementById('insuranceStatus').value;
+function submitSurvey() {
+    var age = document.getElementById('ageGroup').value;
+    var job = document.getElementById('jobStatus').value;
+    var insurance = document.getElementById('insuranceStatus').value;
     if (!age || !job || !insurance) {
-      alert('请完整填写调研信息，感谢配合！');
-      return;
+        alert('请完整填写调研信息，感谢配合！');
+        return;
     }
 
-    // 整理数据
-    let templateParams = {
-      result_type: window.resultType,
-      scores_trust: scores.trust,
-      scores_plan: scores.plan,
-      scores_risk: scores.risk,
-      scores_info: scores.info,
-      age_group: age,
-      job_status: job,
-      insurance_status: insurance,
-      timestamp: new Date().toLocaleString()
+    var payload = {
+        result_type: window.resultType,
+        trust: scores.trust,
+        plan: scores.plan,
+        risk: scores.risk,
+        info: scores.info,
+        age_group: age,
+        job_status: job,
+        insurance_status: insurance
     };
 
-    emailjs.send('service_9nnj815', 'template_cturkig', templateParams)
-      .then(function(response) {
+    // 换成你自己的 Bmob 信息
+    var appId = 'b9d5f091e8fbe932fc0dc9ed547f075e';
+    var restKey = '350cad419ef803bfee01879bd6938dcb';
+    var url = 'https://api.bmob.cn/1/classes/SurveyData';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Bmob-Application-Id': appId,
+            'X-Bmob-REST-API-Key': restKey,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
         document.getElementById('submitMsg').style.display = 'block';
         document.getElementById('surveyForm').innerHTML = '<p style="text-align:center; color:#27ae60;">✅ 提交成功！感谢您为新薪守护者实践队提供数据。</p>';
-      }, function(error) {
+    })
+    .catch(error => {
         alert('提交失败，请稍后再试。');
-        console.log('FAILED...', error);
-      });
-  }
+        console.log('Error:', error);
+    });
+}
 </script>
 </body>
 </html>
