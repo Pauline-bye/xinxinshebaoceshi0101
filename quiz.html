@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>新薪守护者·社保人格测试</title>
-  <!-- 引入EmailJS SDK -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <!-- ⚠️ 已移除 EmailJS SDK，改用 Bmob，无需任何外部脚本 -->
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -119,75 +118,75 @@
 </div>
 
 <script>
-  // -------------- 初始化 EmailJS (替换成你自己的Key) --------------
-  (function(){
-    emailjs.init("myTge7Lh8Hs4ZgkNn");  // 去EmailJS控制台获取
-  })();
+  // ==========================================
+  // 🔑 必改项
+  // ==========================================
+  const BMOB_APP_ID = 'b9d5f091e8fbe932fc0dc9ed547f075e';      
+  const BMOB_REST_KEY = '350cad419ef803bfee01879bd6938dcb';   
+  // ==========================================
 
-  // -------------- 题库：每题包含题目、选项（文本+分数数组）、维度 --------------
+  // -------------- 题库 --------------
   const questions = [
     {
       text: "突然生病需要一笔不小的开销，你的第一反应是？",
       options: [
-        { text: "还好有医保，能报销大部分", scores: { trust: 2, risk: 2 } },
-        { text: "赶紧想办法借钱或动用储蓄", scores: { trust: 0, risk: 0 } },
-        { text: "后悔当初没买更高保障的保险", scores: { trust: 1, risk: 1 } },
-        { text: "扛一扛就过去了，小病不用看", scores: { trust: 0, risk: -1 } }
+        { text: "A.还好有医保，能报销大部分", scores: { trust: 2, risk: 2 } },
+        { text: "B.赶紧想办法借钱或动用储蓄", scores: { trust: 0, risk: 0 } },
+        { text: "C.后悔当初没买更高保障的保险", scores: { trust: 1, risk: 1 } },
+        { text: "D.扛一扛就过去了，小病不用看", scores: { trust: 0, risk: -1 } }
       ]
     },
     {
       text: "对于未来的养老生活，你怎么看？",
       options: [
-        { text: "现在多缴社保，老了有保障", scores: { trust: 2, plan: 2 } },
-        { text: "靠子女或自己储蓄更实在", scores: { trust: 0, plan: 0 } },
-        { text: "政策常变，只能走一步看一步", scores: { trust: 1, plan: -1 } },
-        { text: "还没认真想过", scores: { trust: 0, plan: -2 } }
+        { text: "A.现在多缴社保，老了有保障", scores: { trust: 2, plan: 2 } },
+        { text: "B.靠子女或自己储蓄更实在", scores: { trust: 0, plan: 0 } },
+        { text: "C.政策常变，只能走一步看一步", scores: { trust: 1, plan: -1 } },
+        { text: "D.还没认真想过", scores: { trust: 0, plan: -2 } }
       ]
     },
     {
       text: "如果有一份工作薪资更高但不缴社保，你会？",
       options: [
-        { text: "坚决不去，社保是底线", scores: { trust: 2, plan: 2 } },
-        { text: "可以考虑，多拿现金自己安排", scores: { trust: 0, plan: 0 } },
-        { text: "要求折算成工资补贴给我", scores: { trust: 1, plan: 1 } },
-        { text: "无所谓，有活干就行", scores: { trust: -1, plan: -1 } }
+        { text: "A.坚决不去，社保是底线", scores: { trust: 2, plan: 2 } },
+        { text: "B.可以考虑，多拿现金自己安排", scores: { trust: 0, plan: 0 } },
+        { text: "C.要求折算成工资补贴给我", scores: { trust: 1, plan: 1 } },
+        { text: "D.无所谓，有活干就行", scores: { trust: -1, plan: -1 } }
       ]
     },
     {
       text: "你了解灵活就业人员社保补贴政策吗？",
       options: [
-        { text: "非常了解，还主动帮别人科普", scores: { info: 2, plan: 2 } },
-        { text: "知道一点，但具体不清楚", scores: { info: 1, plan: 1 } },
-        { text: "听说过，但觉得和自己无关", scores: { info: 0, plan: 0 } },
-        { text: "完全不知道", scores: { info: -1, plan: -1 } }
+        { text: "A.非常了解，还主动帮别人科普", scores: { info: 2, plan: 2 } },
+        { text: "B.知道一点，但具体不清楚", scores: { info: 1, plan: 1 } },
+        { text: "C.听说过，但觉得和自己无关", scores: { info: 0, plan: 0 } },
+        { text: "D.完全不知道", scores: { info: -1, plan: -1 } }
       ]
     },
     {
       text: "你更同意以下哪种说法？",
       options: [
-        { text: "社会保险是公民权利，国家会不断完善", scores: { trust: 2, risk: 2 } },
-        { text: "制度是好的，但执行可能有偏差", scores: { trust: 1, risk: 1 } },
-        { text: "缴费容易，享受待遇时门槛太高", scores: { trust: -1, risk: 0 } },
-        { text: "羊毛出在羊身上，意义不大", scores: { trust: -2, risk: -2 } }
+        { text: "A.社会保险是公民权利，国家会不断完善", scores: { trust: 2, risk: 2 } },
+        { text: "B.制度是好的，但执行可能有偏差", scores: { trust: 1, risk: 1 } },
+        { text: "C.缴费容易，享受待遇时门槛太高", scores: { trust: -1, risk: 0 } },
+        { text: "D.羊毛出在羊身上，意义不大", scores: { trust: -2, risk: -2 } }
       ]
     },
     {
       text: "如何看待平台经济的骑手、网约车司机等新业态劳动者？",
       options: [
-        { text: "他们最需要职业伤害保障等新险种", scores: { info: 2, plan: 2 } },
-        { text: "灵活就业是趋势，社保需创新覆盖", scores: { info: 1, plan: 1 } },
-        { text: "他们自己选择多赚钱，就该自己担风险", scores: { info: 0, plan: -1 } },
-        { text: "不太了解这个群体", scores: { info: -1, plan: -2 } }
+        { text: "A.他们最需要职业伤害保障等新险种", scores: { info: 2, plan: 2 } },
+        { text: "B.灵活就业是趋势，社保需创新覆盖", scores: { info: 1, plan: 1 } },
+        { text: "C.他们自己选择多赚钱，就该自己担风险", scores: { info: 0, plan: -1 } },
+        { text: "D.不太了解这个群体", scores: { info: -1, plan: -2 } }
       ]
     }
   ];
 
-  // 当前题目索引、各维度分数累计
   let currentQ = 0;
   let scores = { trust: 0, risk: 0, plan: 0, info: 0 };
-  let totalQuestions = questions.length;
+  const totalQuestions = questions.length;
 
-  // 开始测试
   function startQuiz() {
     document.getElementById('startScreen').classList.remove('active');
     showQuestion(0);
@@ -199,7 +198,7 @@
       return;
     }
     currentQ = index;
-    let q = questions[index];
+    const q = questions[index];
     document.getElementById('questionText').innerText = q.text;
     let optionsHtml = '';
     q.options.forEach((opt, i) => {
@@ -211,14 +210,11 @@
   }
 
   function selectAnswer(qIndex, optIndex) {
-    let selected = questions[qIndex].options[optIndex].scores;
-    // 累加分数
+    const selected = questions[qIndex].options[optIndex].scores;
     for (let dim in selected) {
       scores[dim] = (scores[dim] || 0) + selected[dim];
     }
-    // 下一题
     if (currentQ + 1 < totalQuestions) {
-      // 简单切换动画
       document.getElementById('questionScreen').classList.remove('active');
       setTimeout(() => {
         showQuestion(currentQ + 1);
@@ -230,9 +226,8 @@
   }
 
   function showResult() {
-    // 根据分数决定人格类型 (简单阈值示例)
-    let totalTrust = scores.trust;
-    let totalPlan = scores.plan;
+    const totalTrust = scores.trust;
+    const totalPlan = scores.plan;
     let type;
 
     if (totalTrust >= 6 && totalPlan >= 4) {
@@ -276,8 +271,8 @@
       }
     };
 
-    let r = resultsMap[type];
-    let html = `
+    const r = resultsMap[type];
+    const html = `
       <h2>${r.title}</h2>
       <p style="color:#7f8c8d;">你的劳动者镜像：${r.mirror}</p>
       <div class="result-desc">
@@ -291,55 +286,58 @@
     `;
     document.getElementById('resultContent').innerHTML = html;
     document.getElementById('resultScreen').classList.add('active');
-    // 同时保存类型到全局，以备提交
     window.resultType = type;
   }
 
-  // ---------- 提交调研数据到邮箱 ----------
-function submitSurvey() {
-    var age = document.getElementById('ageGroup').value;
-    var job = document.getElementById('jobStatus').value;
-    var insurance = document.getElementById('insuranceStatus').value;
+  // ---------- 提交调研数据到 Bmob ----------
+  function submitSurvey() {
+    const age = document.getElementById('ageGroup').value;
+    const job = document.getElementById('jobStatus').value;
+    const insurance = document.getElementById('insuranceStatus').value;
     if (!age || !job || !insurance) {
-        alert('请完整填写调研信息，感谢配合！');
-        return;
+      alert('请完整填写调研信息，感谢配合！');
+      return;
     }
 
-    var payload = {
-        result_type: window.resultType,
-        trust: scores.trust,
-        plan: scores.plan,
-        risk: scores.risk,
-        info: scores.info,
-        age_group: age,
-        job_status: job,
-        insurance_status: insurance
+    // 整理数据
+    const payload = {
+      result_type: window.resultType,
+      scores_trust: scores.trust,
+      scores_plan: scores.plan,
+      scores_risk: scores.risk,
+      scores_info: scores.info,
+      age_group: age,
+      job_status: job,
+      insurance_status: insurance,
+      timestamp: new Date().toLocaleString()
     };
 
-    // 换成你自己的 Bmob 信息
-    var appId = 'b9d5f091e8fbe932fc0dc9ed547f075e';
-    var restKey = '350cad419ef803bfee01879bd6938dcb';
-    var url = 'https://api.bmob.cn/1/classes/SurveyData';
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'X-Bmob-Application-Id': appId,
-            'X-Bmob-REST-API-Key': restKey,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+    // 发送到 Bmob
+    fetch('https://api.bmob.cn/1/classes/SurveyData', {
+      method: 'POST',
+      headers: {
+        'X-Bmob-Application-Id': BMOB_APP_ID,
+        'X-Bmob-REST-API-Key': BMOB_REST_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     })
     .then(response => response.json())
     .then(data => {
+      if (data.objectId) {
+        // 提交成功
         document.getElementById('submitMsg').style.display = 'block';
         document.getElementById('surveyForm').innerHTML = '<p style="text-align:center; color:#27ae60;">✅ 提交成功！感谢您为新薪守护者实践队提供数据。</p>';
+      } else {
+        alert('提交失败，请稍后再试。');
+        console.error('Bmob返回异常：', data);
+      }
     })
     .catch(error => {
-        alert('提交失败，请稍后再试。');
-        console.log('Error:', error);
+      alert('提交失败，请检查网络或配置。');
+      console.error('提交出错：', error);
     });
-}
+  }
 </script>
 </body>
 </html>
