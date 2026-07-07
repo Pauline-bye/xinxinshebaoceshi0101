@@ -4,24 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>新薪守护者·社保人格测试</title>
-  <!-- 引入 EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <!-- 引入EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-      /* 莫兰迪灰粉背景 */
-      background: #e8e0db;
+      background: #f5f0eb;
       display: flex; justify-content: center; align-items: center;
       min-height: 100vh; padding: 20px;
     }
     .quiz-container {
       max-width: 500px; width: 100%;
-      /* 米白卡片 */
-      background: #fdfaf6;
-      border-radius: 24px;
-      padding: 40px 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      background: white; border-radius: 24px;
+      padding: 40px 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
       position: relative; overflow: hidden;
     }
     .screen {
@@ -32,73 +28,51 @@
     }
     .question-text {
       font-size: 22px; font-weight: 600; margin-bottom: 30px;
-      /* 深灰褐 */
-      color: #5a4e4a;
-      line-height: 1.4;
+      color: #2c3e50; line-height: 1.4;
     }
     .option {
       display: block; width: 100%; padding: 16px 20px;
-      margin-bottom: 12px;
-      /* 莫兰迪灰绿背景 */
-      background: #e8e3de;
-      border: 2px solid transparent;
-      border-radius: 16px;
+      margin-bottom: 12px; background: #f8f6f3;
+      border: 2px solid transparent; border-radius: 16px;
       font-size: 16px; text-align: left; cursor: pointer;
       transition: all 0.2s;
-      color: #4a403c;
     }
     .option:hover {
-      /* 柔和灰粉 */
-      background: #f0e2d8;
-      border-color: #c2a798;
+      background: #fff5e8; border-color: #e67e22;
     }
     .progress {
-      width: 100%; height: 6px;
-      background: #e3dbd2;
+      width: 100%; height: 6px; background: #eee;
       border-radius: 3px; margin-bottom: 30px;
     }
     .progress-bar {
-      height: 100%; width: 0%;
-      /* 莫兰迪脏橘 */
-      background: #c49b85;
+      height: 100%; width: 0%; background: #e67e22;
       border-radius: 3px; transition: width 0.3s;
     }
     .result-card {
       text-align: center; padding-top: 20px;
     }
     .result-card h2 {
-      font-size: 28px;
-      color: #b58b7a;
-      margin: 10px 0;
+      font-size: 28px; color: #e67e22; margin: 10px 0;
     }
     .result-desc {
-      /* 极浅灰粉 */
-      background: #f7f2ed;
-      border-radius: 16px;
+      background: #fef9f3; border-radius: 16px;
       padding: 20px; margin: 20px 0; text-align: left;
-      color: #4e4440;
     }
     .survey-section {
-      margin-top: 30px; border-top: 1px solid #e3d9cf;
+      margin-top: 30px; border-top: 1px solid #eee;
       padding-top: 20px; text-align: left;
-      color: #5a4e4a;
     }
     .survey-section input, .survey-section select {
       width: 100%; padding: 10px; margin: 8px 0 15px;
-      border: 1px solid #d5c7b9; border-radius: 10px;
-      background: #fefbf8;
-      color: #4e4440;
+      border: 1px solid #ddd; border-radius: 10px;
     }
     .btn {
-      /* 脏橘色按钮 */
-      background: #c49b85; color: white; border: none;
+      background: #e67e22; color: white; border: none;
       padding: 14px 30px; border-radius: 30px;
       font-size: 16px; cursor: pointer; transition: 0.2s;
     }
-    .btn:hover { background: #b0856e; }
+    .btn:hover { background: #d35400; }
     .hidden { display: none; }
-    /* 标题颜色 */
-    h1 { color: #6b5c55; }
   </style>
 </head>
 <body>
@@ -107,7 +81,7 @@
   <div id="startScreen" class="screen active">
     <div style="text-align: center;">
       <h1 style="font-size:32px; margin-bottom:20px;">🔍 你的社保守护者人格</h1>
-      <p style="color:#8b7a70; margin-bottom:40px;">6道情景题，找到你与历史劳动者的共鸣，他们的选择，是否会隔着时间，照亮你的前路</p>
+      <p style="color:#7f8c8d; margin-bottom:40px;">6道情景题，找到你与历史劳动者的共鸣</p>
       <button class="btn" onclick="startQuiz()">开始测试</button>
     </div>
   </div>
@@ -145,75 +119,73 @@
 </div>
 
 <script>
-  // ================== 1. 初始化 EmailJS（替换成你自己的 Public Key）==================
+  // -------------- 初始化 EmailJS (替换成你自己的Key) --------------
   (function(){
-    emailjs.init("myTge7Lh8Hs4ZgkNn"); 
+    emailjs.init("myTge7Lh8Hs4ZgkNn");  // 去EmailJS控制台获取
   })();
 
-  // ================== 2. 题库（可自行修改题目和结果）==================
+  // -------------- 题库：每题包含题目、选项（文本+分数数组）、维度 --------------
   const questions = [
     {
       text: "突然生病需要一笔不小的开销，你的第一反应是？",
       options: [
-        { text: "还好有医保，能报销大部分", scores: { trust: 2, risk: 2 } },
-        { text: "赶紧想办法借钱", scores: { trust: 0, risk: 0 } },
-        { text: "后悔当初没买更高保障的保险", scores: { trust: 1, risk: 1 } },
-        { text: "扛一扛就过去了，小病不用看", scores: { trust: 0, risk: -1 } }
+        { text: "A.还好有医保，能报销大部分", scores: { trust: 2, risk: 2 } },
+        { text: "B.赶紧想办法借钱或动用储蓄", scores: { trust: 0, risk: 0 } },
+        { text: "C.后悔当初没买更高保障的保险", scores: { trust: 1, risk: 1 } },
+        { text: "D.扛一扛就过去了，小病不用看", scores: { trust: 0, risk: -1 } }
       ]
     },
     {
       text: "对于未来的养老生活，你怎么看？",
       options: [
-        { text: "现在多缴社保，老了有保障", scores: { trust: 2, plan: 2 } },
-        { text: "靠子女或自己储蓄更实在", scores: { trust: 0, plan: 0 } },
-        { text: "政策常变，只能走一步看一步", scores: { trust: 1, plan: -1 } },
-        { text: "还没认真想过", scores: { trust: 0, plan: -2 } }
+        { text: "A.现在多缴社保，老了有保障", scores: { trust: 2, plan: 2 } },
+        { text: "B.靠子女或自己储蓄更实在", scores: { trust: 0, plan: 0 } },
+        { text: "C.政策常变，只能走一步看一步", scores: { trust: 1, plan: -1 } },
+        { text: "D.还没认真想过", scores: { trust: 0, plan: -2 } }
       ]
     },
     {
       text: "如果有一份工作薪资更高但不缴社保，你会？",
       options: [
-        { text: "坚决不去，社保是底线", scores: { trust: 2, plan: 2 } },
-        { text: "可以考虑，多拿现金自己安排", scores: { trust: 0, plan: 0 } },
-        { text: "要求折算成工资补贴给我", scores: { trust: 1, plan: 1 } },
-        { text: "无所谓，有活干就行", scores: { trust: -1, plan: -1 } }
+        { text: "A.坚决不去，社保是底线", scores: { trust: 2, plan: 2 } },
+        { text: "B.可以考虑，多拿现金自己安排", scores: { trust: 0, plan: 0 } },
+        { text: "C.要求折算成工资补贴给我", scores: { trust: 1, plan: 1 } },
+        { text: "D.无所谓，有活干就行", scores: { trust: -1, plan: -1 } }
       ]
     },
     {
       text: "你了解灵活就业人员社保补贴政策吗？",
       options: [
-        { text: "非常了解，还主动帮别人科普", scores: { info: 2, plan: 2 } },
-        { text: "知道一点，但具体不清楚", scores: { info: 1, plan: 1 } },
-        { text: "听说过，但觉得和自己无关", scores: { info: 0, plan: 0 } },
-        { text: "完全不知道", scores: { info: -1, plan: -1 } }
+        { text: "A.非常了解，还主动帮别人科普", scores: { info: 2, plan: 2 } },
+        { text: "B.知道一点，但具体不清楚", scores: { info: 1, plan: 1 } },
+        { text: "C.听说过，但觉得和自己无关", scores: { info: 0, plan: 0 } },
+        { text: "D.完全不知道", scores: { info: -1, plan: -1 } }
       ]
     },
     {
       text: "你更同意以下哪种说法？",
       options: [
-        { text: "社会保险是公民权利，国家会不断完善", scores: { trust: 2, risk: 2 } },
-        { text: "制度是好的，但执行可能有偏差", scores: { trust: 1, risk: 1 } },
-        { text: "缴费容易，享受待遇时门槛太高", scores: { trust: -1, risk: 0 } },
-        { text: "羊毛出在羊身上，意义不大", scores: { trust: -2, risk: -2 } }
+        { text: "A.社会保险是公民权利，国家会不断完善", scores: { trust: 2, risk: 2 } },
+        { text: "B.制度是好的，但执行可能有偏差", scores: { trust: 1, risk: 1 } },
+        { text: "C.缴费容易，享受待遇时门槛太高", scores: { trust: -1, risk: 0 } },
+        { text: "D.羊毛出在羊身上，意义不大", scores: { trust: -2, risk: -2 } }
       ]
     },
     {
       text: "如何看待平台经济的骑手、网约车司机等新业态劳动者？",
       options: [
-        { text: "他们最需要职业伤害保障等新险种", scores: { info: 2, plan: 2 } },
-        { text: "灵活就业是趋势，社保需创新覆盖", scores: { info: 1, plan: 1 } },
-        { text: "他们自己选择多赚钱，就该自己担风险", scores: { info: 0, plan: -1 } },
-        { text: "不太了解这个群体", scores: { info: -1, plan: -2 } }
+        { text: "A.他们最需要职业伤害保障等新险种", scores: { info: 2, plan: 2 } },
+        { text: "B.灵活就业是趋势，社保需创新覆盖", scores: { info: 1, plan: 1 } },
+        { text: "C.他们自己选择多赚钱，就该自己担风险", scores: { info: 0, plan: -1 } },
+        { text: "D.不太了解这个群体", scores: { info: -1, plan: -2 } }
       ]
     }
   ];
 
-  // 选项字母前缀
-  const optionLetters = ['A', 'B', 'C', 'D'];
-
+  // 当前题目索引、各维度分数累计
   let currentQ = 0;
   let scores = { trust: 0, risk: 0, plan: 0, info: 0 };
-  const totalQuestions = questions.length;
+  let totalQuestions = questions.length;
 
   // 开始测试
   function startQuiz() {
@@ -227,13 +199,11 @@
       return;
     }
     currentQ = index;
-    const q = questions[index];
+    let q = questions[index];
     document.getElementById('questionText').innerText = q.text;
     let optionsHtml = '';
     q.options.forEach((opt, i) => {
-      // 添加字母前缀
-      const prefix = optionLetters[i] ? optionLetters[i] + '. ' : '';
-      optionsHtml += `<button class="option" onclick="selectAnswer(${index}, ${i})">${prefix}${opt.text}</button>`;
+      optionsHtml += `<button class="option" onclick="selectAnswer(${index}, ${i})">${opt.text}</button>`;
     });
     document.getElementById('optionsContainer').innerHTML = optionsHtml;
     document.getElementById('progressBar').style.width = ((index/totalQuestions)*100) + '%';
@@ -241,11 +211,14 @@
   }
 
   function selectAnswer(qIndex, optIndex) {
-    const selected = questions[qIndex].options[optIndex].scores;
+    let selected = questions[qIndex].options[optIndex].scores;
+    // 累加分数
     for (let dim in selected) {
       scores[dim] = (scores[dim] || 0) + selected[dim];
     }
+    // 下一题
     if (currentQ + 1 < totalQuestions) {
+      // 简单切换动画
       document.getElementById('questionScreen').classList.remove('active');
       setTimeout(() => {
         showQuestion(currentQ + 1);
@@ -257,8 +230,9 @@
   }
 
   function showResult() {
-    const totalTrust = scores.trust;
-    const totalPlan = scores.plan;
+    // 根据分数决定人格类型 (简单阈值示例)
+    let totalTrust = scores.trust;
+    let totalPlan = scores.plan;
     let type;
 
     if (totalTrust >= 6 && totalPlan >= 4) {
@@ -302,8 +276,8 @@
       }
     };
 
-    const r = resultsMap[type];
-    const html = `
+    let r = resultsMap[type];
+    let html = `
       <h2>${r.title}</h2>
       <p style="color:#7f8c8d;">你的劳动者镜像：${r.mirror}</p>
       <div class="result-desc">
@@ -317,20 +291,22 @@
     `;
     document.getElementById('resultContent').innerHTML = html;
     document.getElementById('resultScreen').classList.add('active');
+    // 同时保存类型到全局，以备提交
     window.resultType = type;
   }
 
-  // ================== 3. 提交到邮箱（替换成你自己的 Service ID 和 Template ID）==================
+  // ---------- 提交调研数据到邮箱 ----------
   function submitSurvey() {
-    const age = document.getElementById('ageGroup').value;
-    const job = document.getElementById('jobStatus').value;
-    const insurance = document.getElementById('insuranceStatus').value;
+    let age = document.getElementById('ageGroup').value;
+    let job = document.getElementById('jobStatus').value;
+    let insurance = document.getElementById('insuranceStatus').value;
     if (!age || !job || !insurance) {
       alert('请完整填写调研信息，感谢配合！');
       return;
     }
 
-    const templateParams = {
+    // 整理数据
+    let templateParams = {
       result_type: window.resultType,
       scores_trust: scores.trust,
       scores_plan: scores.plan,
@@ -348,7 +324,7 @@
         document.getElementById('surveyForm').innerHTML = '<p style="text-align:center; color:#27ae60;">✅ 提交成功！感谢您为新薪守护者实践队提供数据。</p>';
       }, function(error) {
         alert('提交失败，请稍后再试。');
-        console.error('EmailJS Error:', error);
+        console.log('FAILED...', error);
       });
   }
 </script>
