@@ -342,7 +342,7 @@
       timestamp: new Date().toLocaleString()
     };
 
-    emailjs.send('你的Service ID', '你的Template ID', templateParams)
+    emailjs.send('service_9nnj815', 'template_cturkig', templateParams)
       .then(function(response) {
         document.getElementById('submitMsg').style.display = 'block';
         document.getElementById('surveyForm').innerHTML = '<p style="text-align:center; color:#27ae60;">✅ 提交成功！感谢您为新薪守护者实践队提供数据。</p>';
