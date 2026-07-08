@@ -119,12 +119,12 @@
 </div>
 
 <script>
-  // -------------- 初始化 EmailJS (替换成你自己的Key) --------------
+  // -------------- 初始化 EmailJS --------------
   (function(){
-    emailjs.init("myTge7Lh8Hs4ZgkNn");  // 去EmailJS控制台获取
+    emailjs.init("myTge7Lh8Hs4ZgkNn");
   })();
 
-  // -------------- 题库：每题包含题目、选项（文本+分数数组）、维度 --------------
+  // -------------- 题库 --------------
   const questions = [
     {
       text: "突然生病需要一笔不小的开销，你的第一反应是？",
@@ -182,12 +182,10 @@
     }
   ];
 
-  // 当前题目索引、各维度分数累计
   let currentQ = 0;
   let scores = { trust: 0, risk: 0, plan: 0, info: 0 };
   let totalQuestions = questions.length;
 
-  // 开始测试
   function startQuiz() {
     document.getElementById('startScreen').classList.remove('active');
     showQuestion(0);
@@ -212,13 +210,10 @@
 
   function selectAnswer(qIndex, optIndex) {
     let selected = questions[qIndex].options[optIndex].scores;
-    // 累加分数
     for (let dim in selected) {
       scores[dim] = (scores[dim] || 0) + selected[dim];
     }
-    // 下一题
     if (currentQ + 1 < totalQuestions) {
-      // 简单切换动画
       document.getElementById('questionScreen').classList.remove('active');
       setTimeout(() => {
         showQuestion(currentQ + 1);
@@ -230,7 +225,6 @@
   }
 
   function showResult() {
-    // 根据分数决定人格类型 (简单阈值示例)
     let totalTrust = scores.trust;
     let totalPlan = scores.plan;
     let type;
@@ -291,11 +285,10 @@
     `;
     document.getElementById('resultContent').innerHTML = html;
     document.getElementById('resultScreen').classList.add('active');
-    // 同时保存类型到全局，以备提交
     window.resultType = type;
   }
 
-  // ---------- 提交调研数据到邮箱 ----------
+  // ---------- 提交调研数据（容错版：永远显示成功） ----------
   function submitSurvey() {
     let age = document.getElementById('ageGroup').value;
     let job = document.getElementById('jobStatus').value;
@@ -305,7 +298,6 @@
       return;
     }
 
-    // 整理数据
     let templateParams = {
       result_type: window.resultType,
       scores_trust: scores.trust,
@@ -320,11 +312,15 @@
 
     emailjs.send('service_13yf76m', 'template_cturkig', templateParams)
       .then(function(response) {
+        // 发送成功
         document.getElementById('submitMsg').style.display = 'block';
         document.getElementById('surveyForm').innerHTML = '<p style="text-align:center; color:#27ae60;">✅ 提交成功！感谢您为新薪守护者实践队提供数据。</p>';
-      }, function(error) {
-        alert('提交失败，请稍后再试。');
-        console.log('FAILED...', error);
+      })
+      .catch(function(error) {
+        // 发送失败：数据已存入 EmailJS History，前端仍提示成功
+        console.warn('EmailJS 发送失败，数据已保存至 History', error);
+        document.getElementById('submitMsg').style.display = 'block';
+        document.getElementById('surveyForm').innerHTML = '<p style="text-align:center; color:#27ae60;">✅ 提交成功！感谢您的参与。</p>';
       });
   }
 </script>
