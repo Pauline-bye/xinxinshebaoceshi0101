@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新薪守护者·社保人格测试</title>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f5f0eb;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .quiz-container {
+      max-width: 500px; width: 100%;
+      background: white; border-radius: 24px;
+      padding: 40px 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      position: relative; overflow: hidden;
+    }
+    .screen {
+      display: none; opacity: 0; transition: opacity 0.4s ease;
+    }
+    .screen.active {
+      display: block; opacity: 1;
+    }
+    .question-text {
+      font-size: 22px; font-weight: 600; margin-bottom: 30px;
+      color: #2c3e50; line-height: 1.4;
+    }
+    .option {
+      display: block; width: 100%; padding: 16px 20px;
+      margin-bottom: 12px; background: #f8f6f3;
+      border: 2px solid transparent; border-radius: 16px;
+      font-size: 16px; text-align: left; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .option:hover {
+      background: #fff5e8; border-color: #e67e22;
+    }
+    .progress {
+      width: 100%; height: 6px; background: #eee;
+      border-radius: 3px; margin-bottom: 30px;
+    }
+    .progress-bar {
+      height: 100%; width: 0%; background: #e67e22;
+      border-radius: 3px; transition: width 0.3s;
+    }
+    .result-card {
+      text-align: center; padding-top: 20px;
+    }
+    .result-card h2 {
+      font-size: 28px; color: #e67e22; margin: 10px 0;
+    }
+    .result-desc {
+      background: #fef9f3; border-radius: 16px;
+      padding: 20px; margin: 20px 0; text-align: left;
+    }
+    .btn {
+      background: #e67e22; color: white; border: none;
+      padding: 14px 30px; border-radius: 30px;
+      font-size: 16px; cursor: pointer; transition: 0.2s;
+    }
+    .btn:hover { background: #d35400; }
+  </style>
+</head>
+<body>
+<div class="quiz-container">
+  <!-- 开始页 -->
+  <div id="startScreen" class="screen active">
+    <div style="text-align: center;">
+      <h1 style="font-size:32px; margin-bottom:20px;">🔍 你的社保守护者人格</h1>
+      <p style="color:#7f8c8d; margin-bottom:40px;">9道题（6道情景 + 3张背景卡片），找到你与历史劳动者的共鸣</p>
+      <button class="btn" onclick="startQuiz()">开始测试</button>
+    </div>
+  </div>
+
+  <!-- 答题屏幕 -->
+  <div id="questionScreen" class="screen">
+    <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+    <div id="questionText" class="question-text"></div>
+    <div id="optionsContainer"></div>
+  </div>
+
+  <!-- 结果屏幕 -->
+  <div id="resultScreen" class="screen">
+    <div id="resultContent" class="result-card"></div>
+  </div>
+</div>
+
+<script>
+  // -------------- 初始化 EmailJS --------------
+  (function(){
+    emailjs.init("myTge7Lh8Hs4ZgkNn");
+  })();
+
+  // -------------- 题库：前6题为情景题，后3题为信息收集题 --------------
+  const questions = [
+    // 原有情景题（1-6）
+    {
+      text: "突然生病需要一笔不小的开销，你的第一反应是？",
+      options: [
+        { text: "A.还好有医保，能报销大部分", scores: { trust: 2, risk: 2 } },
+        { text: "B.赶紧想办法借钱或动用储蓄", scores: { trust: 0, risk: 0 } },
+        { text: "C.后悔当初没买更高保障的保险", scores: { trust: 1, risk: 1 } },
+        { text: "D.扛一扛就过去了，小病不用看", scores: { trust: 0, risk: -1 } }
+      ]
+    },
+    {
+      text: "对于未来的养老生活，你怎么看？",
+      options: [
+        { text: "A.现在多缴社保，老了有保障", scores: { trust: 2, plan: 2 } },
+        { text: "B.靠子女或自己储蓄更实在", scores: { trust: 0, plan: 0 } },
+        { text: "C.政策常变，只能走一步看一步", scores: { trust: 1, plan: -1 } },
+        { text: "D.还没认真想过", scores: { trust: 0, plan: -2 } }
+      ]
+    },
+    {
+      text: "如果有一份工作薪资更高但不缴社保，你会？",
+      options: [
+        { text: "A.坚决不去，社保是底线", scores: { trust: 2, plan: 2 } },
+        { text: "B.可以考虑，多拿现金自己安排", scores: { trust: 0, plan: 0 } },
+        { text: "C.要求折算成工资补贴给我", scores: { trust: 1, plan: 1 } },
+        { text: "D.无所谓，有活干就行", scores: { trust: -1, plan: -1 } }
+      ]
+    },
+    {
+      text: "你了解灵活就业人员社保补贴政策吗？",
+      options: [
+        { text: "A.非常了解，还主动帮别人科普", scores: { info: 2, plan: 2 } },
+        { text: "B.知道一点，但具体不清楚", scores: { info: 1, plan: 1 } },
+        { text: "C.听说过，但觉得和自己无关", scores: { info: 0, plan: 0 } },
+        { text: "D.完全不知道", scores: { info: -1, plan: -1 } }
+      ]
+    },
+    {
+      text: "你更同意以下哪种说法？",
+      options: [
+        { text: "A.社会保险是公民权利，国家会不断完善", scores: { trust: 2, risk: 2 } },
+        { text: "B.制度是好的，但执行可能有偏差", scores: { trust: 1, risk: 1 } },
+        { text: "C.缴费容易，享受待遇时门槛太高", scores: { trust: -1, risk: 0 } },
+        { text: "D.羊毛出在羊身上，意义不大", scores: { trust: -2, risk: -2 } }
+      ]
+    },
+    {
+      text: "如何看待平台经济的骑手、网约车司机等新业态劳动者？",
+      options: [
+        { text: "A.他们最需要职业伤害保障等新险种", scores: { info: 2, plan: 2 } },
+        { text: "B.灵活就业是趋势，社保需创新覆盖", scores: { info: 1, plan: 1 } },
+        { text: "C.他们自己选择多赚钱，就该自己担风险", scores: { info: 0, plan: -1 } },
+        { text: "D.不太了解这个群体", scores: { info: -1, plan: -2 } }
+      ]
+    },
+    // 新增信息收集题（7-9），无 scores，仅记录选择
+    {
+      text: "📋 背景卡片 1/3：你现在处于哪个生活阶段？",
+      options: [
+        { text: "18-25岁", value: "18-25" },
+        { text: "26-35岁", value: "26-35" },
+        { text: "36-45岁", value: "36-45" },
+        { text: "46岁及以上", value: "46+" }
+      ]
+    },
+    {
+      text: "📋 背景卡片 2/3：你目前的工作方式更接近哪种？",
+      options: [
+        { text: "全职就业", value: "全职就业" },
+        { text: "灵活就业 / 平台零工", value: "灵活就业/平台零工" },
+        { text: "自由职业", value: "自由职业" },
+        { text: "目前未就业", value: "未就业" }
+      ]
+    },
+    {
+      text: "📋 背景卡片 3/3：关于社会保险，你现在的情况是？",
+      options: [
+        { text: "是，连续缴纳中", value: "是，连续缴纳" },
+        { text: "曾经参加，现在中断了", value: "曾经参加，现在中断" },
+        { text: "从未参加过", value: "从未参加" }
+      ]
+    }
+  ];
+
+  let currentQ = 0;
+  let scores = { trust: 0, risk: 0, plan: 0, info: 0 };
+  let totalQuestions = questions.length;  // 9
+  // 存储背景卡片答案
+  let userAge = '', userJob = '', userInsurance = '';
+
+  function startQuiz() {
+    document.getElementById('startScreen').classList.remove('active');
+    showQuestion(0);
+  }
+
+  function showQuestion(index) {
+    if (index >= totalQuestions) {
+      // 所有题答完，直接展示结果并静默发送数据
+      showResult();
+      sendDataSilently();
+      return;
+    }
+    currentQ = index;
+    let q = questions[index];
+    document.getElementById('questionText').innerText = q.text;
+    let optionsHtml = '';
+    q.options.forEach((opt, i) => {
+      optionsHtml += `<button class="option" onclick="selectAnswer(${index}, ${i})">${opt.text}</button>`;
+    });
+    document.getElementById('optionsContainer').innerHTML = optionsHtml;
+    document.getElementById('progressBar').style.width = ((index/totalQuestions)*100) + '%';
+    document.getElementById('questionScreen').classList.add('active');
+  }
+
+  function selectAnswer(qIndex, optIndex) {
+    let q = questions[qIndex];
+    let selected = q.options[optIndex];
+    
+    // 情景题累计分数
+    if (selected.scores) {
+      for (let dim in selected.scores) {
+        scores[dim] = (scores[dim] || 0) + selected.scores[dim];
+      }
+    } 
+    // 信息收集题记录值
+    else if (selected.value !== undefined) {
+      if (qIndex === 6) userAge = selected.value;
+      else if (qIndex === 7) userJob = selected.value;
+      else if (qIndex === 8) userInsurance = selected.value;
+    }
+
+    // 前进到下一题或结束
+    if (currentQ + 1 < totalQuestions) {
+      document.getElementById('questionScreen').classList.remove('active');
+      setTimeout(() => {
+        showQuestion(currentQ + 1);
+      }, 300);
+    } else {
+      // 最后一题答完，隐藏答题屏，稍后显示结果（数据已在 selectAnswer 中记录）
+      document.getElementById('questionScreen').classList.remove('active');
+      setTimeout(() => {
+        showResult();
+        sendDataSilently();
+      }, 300);
+    }
+  }
+
+  function showResult() {
+    let totalTrust = scores.trust;
+    let totalPlan = scores.plan;
+    let type;
+
+    if (totalTrust >= 6 && totalPlan >= 4) {
+      type = "未雨绸缪型";
+    } else if (totalTrust <= 2 && totalPlan <= 1) {
+      type = "即时满足型";
+    } else if (totalTrust >= 3 && totalPlan <= 2) {
+      type = "焦虑观望型";
+    } else {
+      type = "新业态探索型";
+    }
+
+    const resultsMap = {
+      "未雨绸缪型": {
+        title: "🛡️ 未雨绸缪型",
+        mirror: "90年代坚持缴纳社保的老国企工人 王建国",
+        desc: "你和王师傅一样，笃信“单位-国家”保障网，对制度有长期信任。但今天的社保早已不只是职工保险，灵活就业、异地结转等新规则你熟悉吗？",
+        policy: "近期灵活就业社保补贴、个人养老金制度已推开，可关注当地人社公众号获取指南。",
+        action: "建议你继续保持规划意识，同时帮助身边的新业态从业者了解政策入口。"
+      },
+      "即时满足型": {
+        title: "💰 即时满足型",
+        mirror: "2000年初“用脚投票”的农民工 李春生",
+        desc: "你更看重眼前收入，这曾是无数进城务工者的理性选择。但跨省转移接续、异地就医结算已大幅改善，不参保的风险正在累积。",
+        policy: "国家已全面取消户籍限制，灵活就业人员可在就业地参保。",
+        action: "算一笔账：以最低档缴费，大病医保的杠杆效应可能让你避免因病返贫。"
+      },
+      "焦虑观望型": {
+        title: "🔍 焦虑观望型",
+        mirror: "经历下岗潮后摆摊创业的 赵红霞",
+        desc: "你对制度有疑虑，这像极了90年代下岗再就业者的复杂心态。但现在的失业保险、社保补贴、4050政策等正是为过渡期设计的。",
+        policy: "多地推出“失业补助金”“社保缴费缓缴”等阶段性政策。",
+        action: "拨打12333热线或去社区事务受理中心，你可能比想象中多一份保障。"
+      },
+      "新业态探索型": {
+        title: "🚀 新业态探索型",
+        mirror: "当代外卖骑手 / 自由职业者 小刘",
+        desc: "你代表了最当下的劳动形态，却也暴露了制度空白。职业伤害保险试点已覆盖多省市，这是专门为平台从业者设计的。",
+        policy: "7省市试点新就业形态就业人员职业伤害保障，由平台承担保费。",
+        action: "如果你是平台从业者，主动确认平台是否已为你投保，若非试点城市可呼吁本地纳入。"
+      }
+    };
+
+    let r = resultsMap[type];
+    let html = `
+      <h2>${r.title}</h2>
+      <p style="color:#7f8c8d;">你的劳动者镜像：${r.mirror}</p>
+      <div class="result-desc">
+        <p><strong>📖 时代共鸣</strong><br>${r.desc}</p>
+        <p style="margin-top:15px;"><strong>📌 现行政策指引</strong><br>${r.policy}</p>
+        <p style="margin-top:15px;"><strong>✅ 给你的行动建议</strong><br>${r.action}</p>
+      </div>
+      <p style="color:#95a5a6; margin-top:20px;">感谢你完成了全部9道题目，你的答案已匿名帮助我们更好地理解劳动者现状。</p>
+    `;
+    document.getElementById('resultContent').innerHTML = html;
+    document.getElementById('resultScreen').classList.add('active');
+  }
+
+  // 静默发送数据，不阻塞 UI，完全忽略发送结果
+  function sendDataSilently() {
+    // 确保背景信息已填写（必须答完9题才会调用）
+    if (!userAge || !userJob || !userInsurance) return;
+
+    let templateParams = {
+      result_type: (() => {
+        let totalTrust = scores.trust;
+        let totalPlan = scores.plan;
+        if (totalTrust >= 6 && totalPlan >= 4) return "未雨绸缪型";
+        if (totalTrust <= 2 && totalPlan <= 1) return "即时满足型";
+        if (totalTrust >= 3 && totalPlan <= 2) return "焦虑观望型";
+        return "新业态探索型";
+      })(),
+      scores_trust: scores.trust,
+      scores_plan: scores.plan,
+      scores_risk: scores.risk,
+      scores_info: scores.info,
+      age_group: userAge,
+      job_status: userJob,
+      insurance_status: userInsurance,
+      timestamp: new Date().toLocaleString()
+    };
+
+    // 异步发送，不做任何 UI 反馈
+    emailjs.send('service_13yf76m', 'template_cturkig', templateParams)
+      .catch(err => console.warn('数据后台同步异常，已记录', err));
+  }
+</script>
+</body>
+</html>
